@@ -155,6 +155,7 @@ Put a `dcache.config.json` in the directory you run from. Everything is optional
 | Key                 | Type                                      | Default                         | Description                                                                 |
 | ------------------- | ----------------------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
 | `cacheDir`          | `string`                                  | `node_modules/.cache/dcache`    | Filesystem cache location.                                                  |
+| `logLevel`          | `"debug" \| "info" \| "warn" \| "error"`  | `"info"`                        | Log verbosity; `debug` prints the hash and benchmark timings.               |
 | `envFile`           | `string`                                  | —                               | `.env` file loaded before `${VAR}` interpolation.                           |
 | `ignore`            | `string[]`                                | `[]`                            | Always-excluded globs, merged with `--ignore`.                              |
 | `respectGitignore`  | `boolean`                                 | `true`                          | Only hash files git tracks (or untracked-but-not-ignored).                  |
@@ -163,7 +164,7 @@ Put a `dcache.config.json` in the directory you run from. Everything is optional
 
 All string values support `${ENV_VAR}` interpolation, so secrets stay out of the file.
 
-Set log verbosity with `DCACHE_LOG_LEVEL=debug|info|warn|error` (default `info`); `debug` prints the computed hash and benchmark timings.
+The `DCACHE_LOG_LEVEL` environment variable overrides `logLevel`, e.g. `DCACHE_LOG_LEVEL=debug dcache run …`.
 
 ### Providers
 

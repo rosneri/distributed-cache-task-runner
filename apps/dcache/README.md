@@ -90,6 +90,8 @@ Configuration lives in `dcache.config.json` in the current working directory. If
 
 `respectGitignore` (default `true`) restricts glob matches to files that are tracked or untracked-but-not-ignored by git, using `git ls-files --cached --others --exclude-standard`. This is the most reliable way to keep developer-machine artifacts (build outputs, local logs, scratch files) out of the cache hash so it matches a fresh CI checkout. Falls back to keeping all matched files (with a warning) when not in a git repo. Set to `false` to disable.
 
+The `DCACHE_LOG_LEVEL` environment variable overrides `logLevel`.
+
 String values support `${ENV_VAR}` interpolation. Use `envFile` to load a `.env` before interpolation runs — keeps secrets out of the config file.
 
 ### Filesystem provider (default)

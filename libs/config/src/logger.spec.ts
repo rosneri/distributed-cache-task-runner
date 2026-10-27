@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { logger } from './logger.js';
+import { logger, setLogLevel } from './logger.js';
 
 describe('logger', () => {
   let stderrSpy: ReturnType<typeof vi.spyOn>;
@@ -12,6 +12,7 @@ describe('logger', () => {
 
   afterEach(() => {
     stderrSpy.mockRestore();
+    setLogLevel('info');
     if (originalEnv !== undefined) {
       process.env['DCACHE_LOG_LEVEL'] = originalEnv;
     } else {
@@ -65,5 +66,19 @@ describe('logger', () => {
     logger.debug('hidden');
     logger.info('visible');
     expect(stderrSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the level set via setLogLevel', () => {
+    setLogLevel('error');
+    logger.info('hidden');
+    logger.error('visible');
+    expect(stderrSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets DCACHE_LOG_LEVEL override setLogLevel', () => {
+    setLogLevel('error');
+    process.env['DCACHE_LOG_LEVEL'] = 'debug';
+    logger.debug('visible');
+    expect(stderrSpy).toHaveBeenCalledWith('[dcache:debug] visible\n');
   });
 });

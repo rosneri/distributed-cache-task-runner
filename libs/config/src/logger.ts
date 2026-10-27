@@ -7,12 +7,19 @@ const LOG_LEVELS = {
 
 type LogLevel = keyof typeof LOG_LEVELS;
 
+let configuredLevel: LogLevel = 'info';
+
+/** Set the level from config. `DCACHE_LOG_LEVEL` still takes precedence. */
+export function setLogLevel(level: LogLevel): void {
+  configuredLevel = level;
+}
+
 function getLogLevel(): LogLevel {
   const env = process.env['DCACHE_LOG_LEVEL']?.toLowerCase();
   if (env && env in LOG_LEVELS) {
     return env as LogLevel;
   }
-  return 'info';
+  return configuredLevel;
 }
 
 function shouldLog(messageLevel: LogLevel): boolean {

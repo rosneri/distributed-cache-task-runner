@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { loadConfig } from './config.js';
+import { logger, setLogLevel } from './logger.js';
 
 describe('loadConfig', () => {
   let tempDir: string;
   const savedEnv: Record<string, string | undefined> = {};
-  const TRACKED = ['MY_DB_URL', 'MISSING_VAR', 'FROM_ENVFILE'];
+  const TRACKED = ['MY_DB_URL', 'MISSING_VAR', 'FROM_ENVFILE', 'DCACHE_LOG_LEVEL'];
 
   function makeTempDir(): string {
     tempDir = mkdtempSync(join(tmpdir(), 'dcache-config-test-'));
@@ -27,6 +28,7 @@ describe('loadConfig', () => {
       else delete process.env[key];
     }
     if (tempDir) rmSync(tempDir, { recursive: true, force: true });
+    setLogLevel('info');
   });
 
   it('returns default config when no config file', () => {
@@ -49,6 +51,17 @@ describe('loadConfig', () => {
     const config = loadConfig(dir);
     expect(config.cacheDir).toBe('/custom/cache');
     expect(config.logLevel).toBe('debug');
+  });
+
+  it('applies logLevel to the logger', () => {
+    const dir = makeTempDir();
+    writeFileSync(join(dir, 'dcache.config.json'), JSON.stringify({ logLevel: 'error' }));
+    loadConfig(dir);
+    const spy = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
+    logger.info('hidden');
+    logger.error('visible');
+    expect(spy).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
   });
 
   it('reads explicit filesystem provider', () => {
