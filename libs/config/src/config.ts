@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, resolve } from 'node:path';
 import { config as loadDotenv } from 'dotenv';
 import { z } from 'zod';
-import type { LogLevel } from './logger.js';
+import { setLogLevel, type LogLevel } from './logger.js';
 
 const FilesystemProviderSchema = z.object({
   type: z.literal('filesystem'),
@@ -102,6 +102,7 @@ export function loadConfig(cwd?: string): DcacheConfig {
   const defaultCacheDir = join(resolvedCwd, 'node_modules', '.cache', 'dcache');
   const cacheDir = parsed.cacheDir ?? defaultCacheDir;
   const logLevel: LogLevel = parsed.logLevel ?? 'info';
+  setLogLevel(logLevel);
 
   const provider: ProviderConfig = parsed.provider ?? {
     type: 'filesystem',
